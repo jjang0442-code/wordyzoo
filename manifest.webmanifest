@@ -1,0 +1,30 @@
+{
+ "name": "워디 주 (Wordy Zoo)",
+ "short_name": "워디 주",
+ "description": "6~10세 아이를 위한 영어 단어 동물원 게임",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#FFF6E5",
+ "theme_color": "#FFF6E5",
+ "lang": "ko",
+ "icons": [
+  {
+   "src": "icons/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icons/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "icons/maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
