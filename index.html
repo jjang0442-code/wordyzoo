@@ -1815,6 +1815,126 @@ verbArt=function(v,a){
   }
   return _verbArt4(v,a);
 };
+/* ===== 워디 주 그림 11탄: 특징이 약한 동물을 옆모습·특징 중심으로 다시 그림 ===== */
+const sEye=(x,y,r=3.6)=>`<g class="blink" style="transform-origin:${x}px ${y}px">${C(x,y,r,INK)}${C(x+r*.35,y-r*.35,r*.36,'#fff')}</g>`;
+const sCheek=(x,y,r=4)=>E(x,y,r,r*.6,'#FF8FAB','opacity=".55"');
+// 옆모습 다리: 뒷다리(어두움) 먼저, 앞다리 나중. xs=[뒤앞, 뒤뒤, 앞앞, 앞뒤]
+const sLegs=(xs,top,bot,c,dk,w=9,hoof)=>[1,3,0,2].map(i=>[xs[i],i]).map(([x,i])=>`<rect x="${x-w/2}" y="${top}" width="${w}" height="${bot-top}" rx="${w/2}" fill="${i%2?dk:c}" ${st(dk)}/>`+(hoof?`<rect x="${x-w/2}" y="${bot-5}" width="${w}" height="5" rx="2" fill="${hoof}"/>`:'')).join('');
+Object.assign(ART,{
+  camel:()=>{const c='#E0AE6E',d='#A8743E';return svgWrap(`
+    ${P('M22 62 q-8 4 -8 18','none',`stroke="${d}" stroke-width="3" stroke-linecap="round"`)}${E(14,82,3,5,d)}
+    ${sLegs([34,40,66,72],70,108,c,d,9,'#8A5A2B')}
+    ${P('M20 70 q-2 -14 12 -18 q6 -22 18 -22 q10 0 12 14 q6 -14 16 -12 q12 4 10 24 q4 6 2 16 q-30 10 -70 -2z',c,st(d))}
+    ${P('M78 58 q6 -4 8 -16 q2 -14 10 -18 l8 4 q-6 8 -6 20 q0 10 -8 18z',c,st(d))}
+    ${P('M92 18 q10 -4 18 2 q6 4 4 10 q-2 6 -10 6 h-10 q-6 -2 -6 -10z',c,st(d))}${E(91,16,4,6,c,st(d))}
+    ${sEye(100,22)}${ln('M112 26 q-2 3 -5 3',INK,1.6)}${C(113,24,1.2,INK)}${sCheek(103,30,3)}`,38)},
+  wolf:()=>{const c='#8E9AAA',d='#56616F',l='#E4E8EE';return `<svg viewBox="0 0 120 120" class="art">${C(28,24,13,'#FFF3B0',st('#E8C95A'))}${shadow(32)}
+    ${P('M22 96 q-14 -4 -12 -24 q8 10 18 10z',c,st(d))}
+    ${sLegs([46,40,70,76],84,110,c,d,9)}
+    ${P('M24 92 q-4 -24 18 -30 q20 -6 36 -26 l18 8 q-4 22 -14 32 q2 12 -2 22 q-30 6 -56 -6z',c,st(d))}${P('M60 80 q10 -10 18 -6 q2 10 -4 18 q-8 0 -14 -12z',l)}
+    ${P('M74 40 q-2 -16 12 -24 q14 -6 24 -16 q2 8 -4 14 q8 0 10 6 q-12 6 -22 22 q-10 8 -20 -2z',c,st(d))}${P('M82 18 l-2 -14 l10 8z',c,st(d))}${P('M84 14 l0 -6 l4 4z','#F2C4CC')}
+    ${P('M98 12 q8 -6 14 -12 q2 6 -6 12z','#3D3D46')}${P('M96 22 q8 0 16 -10 q-2 10 -14 14z',l)}${sEye(90,22,3.2)}
+    ${ln('M108 -2 q6 -4 8 2 M104 -6 q6 -8 12 -4','#9CA8B4',2)}</svg>`.replace('viewBox="0 0 120 120"','viewBox="0 -8 120 128"')},
+  giraffe:()=>{const c='#F6C35A',d='#C98A2A',sp='#C9772E';return svgWrap(`<g transform="translate(6,9) scale(.92)">
+    ${P('M30 60 q-10 6 -10 22','none',`stroke="${d}" stroke-width="3" stroke-linecap="round"`)}${P('M18 82 q2 6 4 0z','#6E4428')}
+    ${sLegs([36,44,62,70],66,110,c,d,7,'#6E4428')}
+    ${E(52,62,24,14,c,st(d))}${P('M64 54 l18 -42 l10 4 l-14 46z',c,st(d))}
+    ${P('M80 14 q8 -10 20 -6 q12 4 12 12 q0 6 -8 6 h-14 q-10 0 -10 -12z',c,st(d))}
+    ${ln('M88 8 v-8 M94 8 v-8',d,2.4)}${C(88,0,3,'#8A5A2B')}${C(94,0,3,'#8A5A2B')}${E(83,10,5,3,c,st(d)+' transform="rotate(-30 83 10)"')}
+    ${[[42,56,5],[56,54,6],[50,68,5],[64,66,4],[36,66,4],[72,36,4],[77,24,3],[68,48,3.4]].map(([x,y,r])=>P(`M${x-r} ${y} q0 ${-r} ${r} ${-r} q${r} 0 ${r} ${r} q0 ${r} ${-r} ${r} q${-r} 0 ${-r} ${-r}z`,sp)).join('')}
+    ${P('M64 52 l16 -38','none',`stroke="#8A5A2B" stroke-width="3" stroke-dasharray="3 3"`)}
+    ${sEye(96,14,3.2)}${C(110,20,1.2,INK)}${ln('M104 23 q3 2 6 0',INK,1.4)}${sCheek(98,22,3)}</g>`,34)},
+  rhino:()=>{const c='#A9AEB8',d='#6E7480';return svgWrap(`
+    ${P('M18 60 q-8 2 -8 12','none',`stroke="${d}" stroke-width="3" stroke-linecap="round"`)}
+    ${sLegs([32,26,66,72],80,108,c,d,13)}
+    ${P('M16 80 q-6 -30 26 -36 q30 -6 50 4 q4 20 -6 36 q-36 8 -70 -4z',c,st(d))}${ln('M44 50 q4 16 0 32 M62 48 q4 16 0 34',d,1.6)}
+    ${P('M80 50 q10 -10 22 -4 q14 6 16 18 q2 12 -10 14 q-18 4 -28 -6z',c,st(d))}
+    ${P('M106 52 l6 -24 l4 22z','#E8E2D6',st('#9C9282'))}${P('M98 50 l2 -12 l6 10z','#E8E2D6',st('#9C9282'))}
+    ${P('M82 46 l-4 -12 l10 8z',c,st(d))}${sEye(94,56,3.2)}${ln('M106 70 q4 2 8 -2',INK,1.6)}${sCheek(100,64,3)}`,40)},
+  hippo:()=>{const c='#9C8CC8',d='#6A5A98',l='#C8BCE6';return svgWrap(`
+    ${sLegs([30,24,62,68],84,108,c,d,14)}
+    ${P('M12 84 q-6 -34 28 -40 q30 -6 48 8 q4 18 -4 34 q-38 10 -72 -2z',c,st(d))}${E(46,86,28,6,l,'opacity=".7"')}
+    ${P('M76 52 q6 -16 22 -14 q18 2 20 18 v8 q-2 10 -12 12 q-14 4 -26 -4z',c,st(d))}
+    ${P('M84 72 q10 10 26 4 q6 -2 6 -10 q-16 4 -32 6z','#F2A6B8',st(d))}${P('M90 72 v6 M104 70 v6','none','stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"')}
+    ${C(84,40,5,c,st(d))}${C(84,40,2.4,'#F2A6B8')}${sEye(92,48,3.4)}${E(112,52,2,1.4,INK)}${sCheek(100,58,3.4)}
+    ${P('M0 100 q20 -6 40 0 q20 6 40 0 q20 -6 40 0 v20 h-120z','#8FD3FF','opacity=".55"')}`,0)},
+  kangaroo:()=>{const c='#D19A62',d='#9A6634',l='#F2D2A8';return svgWrap(`
+    ${P('M44 92 q-24 6 -38 18 q-2 -6 4 -10 q14 -10 32 -16z',c,st(d))}
+    ${P('M46 106 h34 q6 0 6 4 h-40z',c,st(d))}${P('M48 98 q-4 10 4 12 h24 v-6 q-10 -2 -14 -12z',c,st(d))}
+    ${P('M44 98 q-10 -34 8 -54 q12 -14 24 -10 q10 20 4 44 q-6 20 -36 20z',c,st(d))}${P('M56 80 q10 -6 20 0 q-2 14 -12 14 q-8 -2 -8 -14z',l,st(d))}
+    ${C(66,78,7,c,st(d))}${E(63,72,2,4,c,st(d))}${C(68,78,1.6,INK)}
+    ${P('M76 56 q8 4 10 12 M74 62 q6 6 6 12','none',`stroke="${d}" stroke-width="4" stroke-linecap="round"`)}
+    ${P('M64 36 q2 -14 16 -16 q14 0 18 10 q4 10 -6 12 h-16 q-12 0 -12 -6z',c,st(d))}${E(66,14,4,12,c,st(d)+' transform="rotate(-14 66 14)"')}${E(76,12,4,12,c,st(d)+' transform="rotate(10 76 12)"')}
+    ${sEye(82,28,3.2)}${C(97,30,1.4,INK)}${sCheek(86,34,3)}`,30)},
+  gorilla:()=>{const c='#3E3E48',d='#24242B',f='#6E6A78';return svgWrap(`
+    ${P('M14 104 q-6 -40 14 -60 q10 -8 32 -8 q22 0 32 8 q20 20 14 60 h-14 q2 -26 -6 -36 v36 h-52 v-36 q-8 10 -6 36z',c,st(d))}
+    ${E(30,104,10,6,f,st(d))}${E(90,104,10,6,f,st(d))}${P('M40 62 q20 -8 40 0 q4 22 -20 30 q-24 -8 -20 -30z',f)}
+    ${P('M38 40 q0 -24 22 -26 q22 2 22 26 q0 14 -22 16 q-22 -2 -22 -16z',c,st(d))}${P('M40 34 q20 -10 40 0 q-4 -6 -20 -6 q-16 0 -20 6z',d)}
+    ${E(60,44,14,10,f,st(d))}${E(56,42,2,1.4,d)}${E(64,42,2,1.4,d)}${ln('M54 48 q6 3 12 0',d,1.8)}
+    ${sEye(52,32,3.2)}${sEye(68,32,3.2)}${C(36,36,5,c,st(d))}${C(84,36,5,c,st(d))}`,46)},
+  hyena:()=>{const c='#C9A87A',d='#8A6A44',sp='#6E5038';return svgWrap(`
+    ${P('M22 70 q-10 6 -10 16','none',`stroke="${d}" stroke-width="4" stroke-linecap="round"`)}${E(12,88,3,5,sp)}
+    ${sLegs([32,26,66,72],76,108,c,d,9)}
+    ${P('M20 78 q-4 -18 18 -22 q24 -6 40 -16 q12 4 10 22 q0 10 -8 14 q-30 10 -60 2z',c,st(d))}${P('M40 52 q20 -6 38 -16','none','stroke="#6E5038" stroke-width="5" stroke-linecap="round"')}
+    ${[[34,66],[46,62],[58,58],[44,74],[60,70],[30,74]].map(([x,y])=>C(x,y,3,sp)).join('')}
+    ${P('M76 44 q6 -16 22 -12 q14 4 18 18 q-4 8 -16 10 q-18 2 -24 -16z',c,st(d))}${C(80,30,7,c,st(d))}${C(80,30,3,'#F2C4CC')}
+    ${P('M98 52 q8 6 18 -2 q-4 -4 -18 2z','#F2A6B8',st(d))}${E(114,46,3,2,INK)}${sEye(92,40,3.2)}${sCheek(98,48,3)}
+    ${ln('M104 30 l4 -6 M110 34 l6 -4',d,2)}`,40)},
+  warthog:()=>{const c='#A88A78',d='#6E5848';return svgWrap(`
+    ${P('M20 70 l-6 -22','none',`stroke="${d}" stroke-width="3" stroke-linecap="round"`)}${P('M10 44 l4 6 l4 -6 l-4 -4z','#4A3A30')}
+    ${sLegs([30,24,62,68],80,108,c,d,9,'#4A3A30')}
+    ${P('M16 82 q-4 -26 24 -32 q24 -4 44 4 q6 16 -2 30 q-34 8 -66 -2z',c,st(d))}
+    ${P('M28 50 l4 -10 l4 8 l4 -10 l4 8 l4 -10 l4 8 l4 -8 l4 8 l4 -6 l2 10z','#5A4638')}
+    ${P('M74 52 q8 -12 22 -8 q18 6 20 24 q0 10 -8 12 q-16 2 -30 -8z',c,st(d))}${E(112,74,6,7,'#C8A898',st(d))}${E(111,72,1.4,2,INK)}${E(114,76,1.4,2,INK)}
+    ${P('M100 76 q-6 -12 4 -20','none','stroke="#FFF6E5" stroke-width="5" stroke-linecap="round"')}${P('M100 76 q-6 -12 4 -20','none','stroke="#C9B9A0" stroke-width="1.2"')}
+    ${C(94,64,3,'#8A6A58')}${C(88,58,2.4,'#8A6A58')}${P('M78 46 l-6 -10 l10 4z',c,st(d))}${sEye(90,54,3)}`,40)},
+  antelope:()=>{const c='#D8A266',d='#9A6634',l='#FFF6E8';return svgWrap(`
+    ${P('M22 62 q-8 2 -8 10','none',`stroke="${d}" stroke-width="3" stroke-linecap="round"`)}
+    ${sLegs([32,26,64,70],70,110,c,d,6,'#4A3A30')}
+    ${E(48,64,28,13,c,st(d))}${P('M26 70 q22 10 46 0 q-2 6 -24 8 q-20 -2 -22 -8z',l)}
+    ${P('M66 58 q8 -18 16 -30 l10 6 q-8 12 -14 28z',c,st(d))}
+    ${P('M80 28 q4 -10 14 -10 q12 0 16 10 q2 6 -6 8 h-14 q-10 0 -10 -8z',c,st(d))}${P('M98 30 q6 6 12 2',l)}
+    ${P('M86 20 q-2 -12 -10 -20 M92 18 q2 -12 -4 -20','none',`stroke="#5A4638" stroke-width="3.4" stroke-linecap="round"`)}${ln('M80 8 h4 M82 4 h4 M88 6 h4 M89 2 h4','#C9B9A0',1.4)}
+    ${E(80,24,5,3,c,st(d)+' transform="rotate(30 80 24)"')}${sEye(94,24,3)}${C(109,30,1.2,INK)}`,34)},
+  gazelle:()=>{const c='#E8B878',d='#A8743E',l='#FFFFFF';return svgWrap(`
+    ${P('M22 60 q-6 0 -6 8','none','stroke="#3D3D46" stroke-width="3" stroke-linecap="round"')}
+    ${sLegs([32,26,64,70],68,110,c,d,5,'#3D3D46')}
+    ${E(48,62,26,11,c,st(d))}${P('M24 64 q24 4 48 0','none','stroke="#5A4638" stroke-width="4" stroke-linecap="round"')}${P('M26 68 q22 8 44 0 q-4 6 -22 6 q-18 0 -22 -6z',l)}
+    ${P('M66 56 q6 -14 12 -22 l8 6 q-6 8 -10 20z',c,st(d))}
+    ${P('M76 34 q4 -8 12 -8 q12 0 14 8 q2 6 -6 6 h-12 q-8 0 -8 -6z',c,st(d))}${P('M86 30 l10 6','none','stroke="#5A4638" stroke-width="2"')}${P('M90 32 l10 2','none','stroke="#FFFFFF" stroke-width="2"')}
+    ${P('M82 26 q-8 -10 -2 -22 q2 6 6 8 M88 26 q-4 -12 4 -22 q0 6 2 10','none','stroke="#3D3D46" stroke-width="2.6" stroke-linecap="round"')}
+    ${E(78,30,5,2.6,c,st(d)+' transform="rotate(30 78 30)"')}${sEye(90,30,2.8)}`,32)},
+  otter:()=>{const c='#9A6A44',d='#6A4428',l='#E8C9A8';return svgWrap(`
+    ${P('M0 72 q15 -6 30 0 q15 6 30 0 q15 -6 30 0 q15 6 30 0 v48 h-120z','#8FD3FF','opacity=".75"')}
+    ${P('M14 68 q-8 -4 -10 4 q4 4 12 2z',c,st(d))}
+    ${P('M14 70 q4 -20 40 -20 q30 0 40 10 q-6 16 -40 16 q-34 0 -40 -6z',c,st(d))}${P('M30 60 q24 -8 54 0 q-20 8 -54 0z',l)}
+    ${E(96,56,16,14,c,st(d))}${E(104,60,8,6,l)}${C(108,57,2.4,INK)}${ln('M100 64 q4 3 8 0',INK,1.4)}${ln('M108 62 l8 -2 M108 64 l8 2',d,1)}
+    ${C(86,46,4,c,st(d))}${sEye(98,52,3)}${sCheek(96,60,3)}
+    ${nest('shell',50,40,20)}${E(48,54,6,4,c,st(d))}${E(70,54,6,4,c,st(d))}
+    ${P('M0 76 q15 -6 30 0 q15 6 30 0 q15 -6 30 0 q15 6 30 0','none','stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"')}`,0)},
+  horse:()=>{const c='#B9784A',d='#7E4A28',m='#4A2E1C';return svgWrap(`
+    ${P('M24 60 q-14 6 -12 30 q6 -6 8 -14 q2 8 6 10 q-2 -14 4 -24z',m)}
+    ${sLegs([34,28,66,72],70,110,c,d,8,'#3D2A1C')}
+    ${E(50,64,28,14,c,st(d))}${P('M68 58 q4 -22 16 -34 l12 8 q-10 14 -12 32z',c,st(d))}
+    ${P('M84 22 q6 -10 16 -6 q10 6 16 22 q2 8 -6 10 q-8 2 -14 -6 q-6 -4 -12 -6z',c,st(d))}${E(112,44,5,4,'#D9A27A')}${C(114,42,1.2,INK)}
+    ${P('M70 56 q0 -20 10 -32 q4 -8 12 -10 l-4 8 q-6 4 -8 12 q-4 6 -4 22z',m)}${P('M86 14 l-2 -10 l8 6z',c,st(d))}${P('M90 16 l2 -8 l4 8z',m)}
+    ${sEye(96,26,3)}${sCheek(102,34,3)}`,36)},
+  eagle:()=>svgWrap(`${P('M58 50 q-30 -20 -54 -10 q14 2 20 10 q-12 0 -18 6 q14 0 22 6 q-8 4 -10 10 q16 -4 40 -6z','#6E4E3A',st('#3D2E28'))}
+    ${P('M62 50 q30 -20 54 -10 q-14 2 -20 10 q12 0 18 6 q-14 0 -22 6 q8 4 10 10 q-16 -4 -40 -6z','#6E4E3A',st('#3D2E28'))}
+    ${E(60,70,16,22,'#6E4E3A',st('#3D2E28'))}${P('M50 90 l10 14 l10 -14z','#FFFFFF',st('#C9C2BA'))}${ln('M54 92 v8 M66 92 v8','#F2B020',3)}
+    ${C(60,40,16,'#FFFFFF',st('#C9C2BA'))}${P('M60 44 h14 q6 0 4 8 q-2 -2 -6 -2 h-12z','#F2B020',st('#C98A10'))}
+    ${P('M48 34 l12 4 M72 34 l-10 4','none','stroke="#3D2E28" stroke-width="2.4" stroke-linecap="round"')}${sEye(54,40,3)}${sEye(66,40,3)}`,40),
+});
+/* 몸의 부분 단어: 동물 그림 위에 해당 부분을 빨간 점선으로 강조 */
+const hiRing=(cx,cy,rx,ry)=>E(cx,cy,rx,ry,'none','stroke="#FF4D6D" stroke-width="3.4" stroke-dasharray="6 5"');
+Object.assign(ART,{
+  mane:()=>`<svg viewBox="0 0 120 120" class="art">${nest('lion',8,8,104)}${hiRing(60,46,40,36)}</svg>`,
+  tail:()=>`<svg viewBox="0 0 120 120" class="art">${nest('fox',6,8,104)}${hiRing(88,76,16,20)}</svg>`,
+  leg:()=>`<svg viewBox="0 0 120 120" class="art">${nest('giraffe',4,4,112)}${hiRing(56,96,24,16)}</svg>`,
+  horn:()=>`<svg viewBox="0 0 120 120" class="art">${nest('rhino',0,6,112)}${hiRing(100,44,11,18)}</svg>`,
+  spots:()=>`<svg viewBox="0 0 120 120" class="art">${nest('cheetah',6,6,108)}${hiRing(60,88,28,20)}</svg>`,
+  stripes:()=>`<svg viewBox="0 0 120 120" class="art">${nest('zebra',6,6,108)}${hiRing(60,86,28,22)}</svg>`,
+});
 </script><script>/* =========================================================
    워디 주 (Wordy Zoo) v3 — 월드 1 「초록 숲 탐험」
    레벨 테스트 · 탐험 지도 · 스테이지(별 3개) · 구조 미션 · 문장 · 말하기 · 풍선 · 대장
