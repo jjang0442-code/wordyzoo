@@ -2680,6 +2680,7 @@ let B=null,bossTimer=null;
 function rBoss(){
   const BW=WORLDS[ctx.bw||0];
   if(!ctx.started){
+    {const zs=readyIn(BW);prefetch(WORDS.filter(w=>zs.includes(w.zone)&&(S.words[w.id]?.seen||S.settings.openAll)).map(w=>w.id).slice(0,240))}
     $app.innerHTML=`<div class="screen" style="justify-content:center;gap:14px">
       <div class="boss-big bob">${art(BW.boss.art)}<div class="crown">👑</div></div>
       <div class="card center"><div style="font-size:24px">${BW.boss.name}${iga(BW.boss.name).slice(BW.boss.name.length)} 나타났어!</div><div class="muted" style="margin-top:6px">60초 안에 단어 12개를 맞히면 이겨요. 하트는 3개!</div></div>
