@@ -2761,7 +2761,7 @@ function rParent(){
       <div class="row">효과음 ${seg('sfx',[true,false],['켜기','끄기'])}</div>
       <div class="row">진동 ${seg('vibe',[true,false],['켜기','끄기'])}</div></div>
     <button class="btn ghost" data-a="reset">${ctx.confirmReset?'정말 지울까요? 한 번 더 누르면 지워져요':'처음부터 다시 시작 (기록 지우기)'}</button>
-    <div class="center small muted">워디 주 체험판 v3 · 열린 구역 ${READY.length}개 (단어 ${WORDS.length}개 · 문장 ${SENT.length}개)</div></div>`;
+    <div class="center small muted"><a href="privacy.html" target="_blank" style="color:inherit">개인정보 처리방침</a> · 워디 주 체험판 v3 · 열린 구역 ${READY.length}개 (단어 ${WORDS.length}개 · 문장 ${SENT.length}개)</div></div>`;
 }
 function rReport(){
   const t=today(),days=[...Array(7)].map((_,i)=>addDays(t,i-6)),lg=S.log||{},wk=days.map(d=>lg[d]||{st:0,nw:0,min:0,sp:0,spOk:0,q:0,qOk:0});
