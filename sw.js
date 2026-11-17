@@ -1,5 +1,5 @@
-// 워디 주 서비스 워커 (오프라인 지원) vfc2d5635
-const V='wz-fc2d5635';const AUDIO='wz-audio-v1';
+// 워디 주 서비스 워커 (오프라인 지원) v98b1fd13
+const V='wz-98b1fd13';const AUDIO='wz-audio-v1';
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(['./','index.html','manifest.webmanifest','icons/icon-192.png'])).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V&&k!==AUDIO).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET')return;
