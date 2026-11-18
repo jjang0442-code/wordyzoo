@@ -1,0 +1,4 @@
+# 기획서·캡처 등 작업 문서는 깃허브에 올리지 않음
+docs/
+.DS_Store
+Thumbs.db
