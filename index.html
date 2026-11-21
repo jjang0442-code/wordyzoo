@@ -542,7 +542,7 @@ input.name:focus{border-color:var(--orange)}
 .zoo-bar{display:none;position:absolute;left:8px;right:8px;bottom:8px;z-index:220;background:rgba(255,255,255,.94);border-radius:18px;padding:8px 8px 8px 14px;align-items:center;gap:8px;font-size:15px;box-shadow:0 4px 0 rgba(0,0,0,.08)}
 .zoo-bar span{flex:1}.zoo-bar .btn{padding:10px 14px;font-size:17px}
 .zoo.editing .zoo-bar{display:flex}.zoo.editing .zoo-edit{display:none}
-.zoo.editing .pal{opacity:.35;pointer-events:none;transition:opacity .3s}.zoo.editing .zoo-msg{display:none}
+.zoo.editing .pal{cursor:grab;touch-action:none;filter:drop-shadow(0 0 0 #fff)}.pal.still,.pal.drag{transition:none}.zoo.editing .pal.drag{filter:drop-shadow(0 6px 6px rgba(0,0,0,.25));cursor:grabbing}.pal.hop .body{animation:palHop .45s ease}@keyframes palHop{40%{transform:translateY(-14px)}}.zoo.editing .zoo-msg{display:none}
 .zoo.editing .decor{pointer-events:auto;cursor:grab;touch-action:none;outline:2.5px dashed rgba(255,255,255,.9);outline-offset:3px;border-radius:10px;animation:decwig 1.6s ease-in-out infinite}
 .zoo.editing .decor.sel{outline-color:#FF9F43;animation:none}
 .zoo.editing .decor.drag{animation:none;filter:drop-shadow(0 10px 8px rgba(0,0,0,.25));z-index:300!important;cursor:grabbing}
@@ -2650,7 +2650,7 @@ function rTestResult(){
 }
 
 /* ---------- 동물원 홈 ---------- */
-function zooPals(){return S.pals.map((p,i)=>{const sc=STAGES_GROW[growOf(p)].scale;const x=12+((i*29)%74),y=62+((i*17)%28);
+function zooPals(){const PP=S.palPlace||{};return S.pals.map((p,i)=>{const sc=STAGES_GROW[growOf(p)].scale;const q=PP[p.id];const x=q?q.x:12+((i*29)%74),y=q?q.y:62+((i*17)%28);
   return `<div class="pal" data-pal="${p.id}" style="left:${x}%;top:${y}%;z-index:${y|0};transform:scale(${sc})"><div class="flip"><div class="body">${art(p.id)}</div></div></div>`}).join('')}
 function decPos(id){const d=DECOR.find(x=>x.id===id);const p=(S.place||{})[id];return{x:p?p.x:d.x,y:p?p.y:d.y,f:p?!!p.f:false,w:d.w}}
 function zooDecor(){const st=S.stored||[];return S.decor.filter(id=>!st.includes(id)).map(id=>{const p=decPos(id);
@@ -2668,8 +2668,8 @@ function rHome(){
       <button class="icon-btn" data-a="gate" aria-label="부모 페이지">🔒</button></div>
     <div class="home-split"><div class="zoo" id="zoo">${zooBackdrop()}${zooDecor()}${zooPals()}
         ${!S.pals.length?`<div class="zoo-msg">아직 구한 친구가 없어요</div>`:''}
-        ${S.decor.length?`<button class="zoo-edit" data-a="zooEdit">✋ 옮기기</button>`:''}
-        <div class="zoo-bar"><span>꾸밈을 손가락으로 끌어서 옮겨 봐!</span><button class="btn green" data-a="zooDone">다 했어 ✓</button></div>
+        ${S.decor.length||S.pals.length?`<button class="zoo-edit" data-a="zooEdit">✋ 옮기기</button>`:''}
+        <div class="zoo-bar"><span>동물과 꾸밈을 손가락으로 끌어서 옮겨 봐!</span><button class="btn green" data-a="zooDone">다 했어 ✓</button></div>
         <div class="dec-tools" id="decTools"><button data-a="decFlip">↔ 뒤집기</button><button data-a="decStore">📦 보관하기</button></div></div>
       <div style="display:flex;flex-direction:column">
         <div class="ellie-row" style="margin-top:12px">${ellie(playable?'happy':'sleep')}<div class="bubble" id="say" data-a="skipTalk"></div></div>
@@ -2681,8 +2681,8 @@ function rHome(){
           <button class="btn ghost" data-a="abc"><span class="ic abc-ic en">Aa</span>ABC 쓰기</button></div></div></div></div>`;
   later(()=>talk(line),350);startWalking();
 }
-function startWalking(){clearInterval(walkTimer);walkTimer=setInterval(()=>{const ps=[...document.querySelectorAll('.pal')];if(!ps.length)return;const p=pick(ps);if(p.classList.contains('busy'))return;
-  const x=10+Math.random()*80,y=60+Math.random()*30,ox=parseFloat(p.style.left);p.classList.toggle('left',x<ox);p.classList.add('walking');p.style.left=x+'%';p.style.top=y+'%';p.style.zIndex=y|0;setTimeout(()=>p.classList.remove('walking'),3200)},1500)}
+function startWalking(){clearInterval(walkTimer);walkTimer=setInterval(()=>{const ps=[...document.querySelectorAll('.pal')];if(!ps.length)return;const p=pick(ps);if(p.classList.contains('busy'))return;const q=(S.palPlace||{})[p.dataset.pal];
+  const x=q?Math.min(95,Math.max(5,q.x-7+Math.random()*14)):10+Math.random()*80,y=q?Math.min(98,Math.max(56,q.y-4+Math.random()*8)):60+Math.random()*30,ox=parseFloat(p.style.left);p.classList.toggle('left',x<ox);p.classList.add('walking');p.style.left=x+'%';p.style.top=y+'%';p.style.zIndex=y|0;setTimeout(()=>p.classList.remove('walking'),3200)},1500)}
 
 /* ---------- 탐험 지도 ---------- */
 function rMap(){
@@ -2726,6 +2726,7 @@ function buildStage(id){
   const[zid,si]=id.split('-');const ws=STAGES[zid][+si];const lv=LEVELS[S.level];const replay=stageStars(id)>0;
   const steps=[];
   ws.forEach(w=>steps.push({t:'learn',w}));
+  if(S.settings.trace!==false){const tw=ws.filter(w=>/^[a-z]/i.test(WORD[w].en));const t=tw[(+si)%Math.max(1,tw.length)];if(t)steps.push({t:'trace',w:t})}
   ws.forEach((w,i)=>steps.push({t:'q',w,type:i<2?'listen':lv.types[(i+1)%lv.types.length]}));
   steps.push(...[0,1,2,3].map(r=>({t:'balloon',r})));
   // 문장: 이번 스테이지 단어가 들어간 문장 우선
@@ -2814,7 +2815,7 @@ function nextStep(){L.i++;if(L.i>=L.steps.length)return finishStage();go('step')
 let Q=null;
 function rStep(){
   const s=L.steps[L.i];Q={s,tries:0,done:false,spell:[],sel:null};
-  ({learn:sLearn,q:sQuiz,balloon:sBalloon,slearn:sSentLearn,sq:sSentQuiz})[s.t](s);
+  ({learn:sLearn,q:sQuiz,balloon:sBalloon,slearn:sSentLearn,sq:sSentQuiz,trace:sTrace})[s.t](s);
 }
 /* 단어 배우기 + 말하기 */
 function sLearn(s){
@@ -3157,6 +3158,7 @@ function rGate(){if(!ctx.a){ctx.a=13+(Math.random()*7|0);ctx.b=4+(Math.random()*
     <div class="keypad">${[1,2,3,4,5,6,7,8,9,'지움',0,'확인'].map(k=>`<button class="btn ghost en" data-key="${k}">${k}</button>`).join('')}</div></div>`}
 function rParent(){
   const st=S.settings;const wrongs=Object.entries(S.words).filter(([,r])=>r.wrong>0).sort((a,b)=>b[1].wrong-a[1].wrong).slice(0,8);
+  if(st.trace===undefined)st.trace=true;
   const seg=(k,vals,labels)=>`<div class="seg">${vals.map((v,i)=>`<span class="${st[k]===v?'on':''}" data-set="${k}" data-val="${v}">${labels[i]}</span>`).join('')}</div>`;
   const totalStars=READY.reduce((a,z)=>a+zoneStarSum(z),0),cleared=Object.values(S.stages).filter(x=>x.stars).length;
   $app.innerHTML=`<div class="screen" style="gap:12px"><div class="topbar"><button class="icon-btn" data-a="home">←</button><div class="mid" style="font-size:24px">부모 페이지</div><div style="width:50px"></div></div>
@@ -3170,6 +3172,7 @@ function rParent(){
       <button class="btn ghost" style="margin-top:10px;width:100%" data-a="retest">레벨 테스트 다시 보기</button></div>
     <div class="card">
       <div class="row">하루 스테이지 수 ${seg('perDay',[1,2,3,5],['1','2','3','5'])}</div>
+      <div class="row"><span>첫 글자 따라 쓰기<br><span class="small muted">단계마다 단어 하나의 첫 글자를 손으로 써 봐요</span></span>${seg('trace',[true,false],['켜기','끄기'])}</div>
       <div class="row"><span>발음 듣기 (마이크)<br><span class="small muted">${SRec?'아이 말을 듣고 칭찬해 줘요 · 녹음은 저장 안 함':'이 브라우저는 지원 안 함 → "말했어" 버튼 사용'}</span></span>${seg('mic',[true,false],['켜기','끄기'])}</div>
       <div class="row">배경음악 ${seg('music',[true,false],['켜기','끄기'])}</div>
       <div class="row">효과음 ${seg('sfx',[true,false],['켜기','끄기'])}</div>
@@ -3251,7 +3254,7 @@ document.addEventListener('click',e=>{
     else{if(answer(false,t,{word:Q.target,label:`<span class="en">${Q.target}</span>`,replay:()=>sayEn(Q.target),after:()=>sayEn(Q.target),reveal:()=>document.querySelector(`[data-bal="${Q.target}"]`)?.classList.add('glow')})===false)t.classList.add('dim')}return}
   if(d.bopt){if(B.lock)return;B.lock=true;const ok=d.bopt===B.w;if(ok){sfx.hit();vib(20);B.hp--;t.classList.add('right');const bm=$('#bm');bm.classList.add('shake');sparkles(bm,5)}else{sfx.no();vib([30,40,30]);B.lives--;t.classList.add('wrong');document.querySelector(`[data-bopt="${B.w}"]`)?.classList.add('right')}
     setTimeout(bossQ,ok?600:1200);return}
-  if(d.pal){const me=S.pals.find(x=>x.id===d.pal);t.classList.add('busy');const b=t.querySelector('.body');b.classList.remove('jump');void b.offsetWidth;b.classList.add('jump');
+  if(d.pal){if(t._dragged&&Date.now()-t._dragged<500)return;const me=S.pals.find(x=>x.id===d.pal);t.classList.add('busy');const b=t.querySelector('.body');b.classList.remove('jump');void b.offsetWidth;b.classList.add('jump');
     t.querySelectorAll('.say').forEach(x=>x.remove());const s=document.createElement('div');s.className='say';s.innerHTML=`<span class="en">${d.pal}</span><span class="h">${heartsTxt(me)}</span>`;t.appendChild(s);sayEn(d.pal);setTimeout(()=>{s.remove();t.classList.remove('busy')},2200);return}
   if(d.feed){feedPal(d.feed,t);return}
   if(d.detail){const[k,id]=d.detail.split(':');sfx.tap();showDetail(k,id);return}
@@ -3335,9 +3338,11 @@ render();
 
 /* ---------- 동물원 꾸밈 옮기기 ---------- */
 let decSel=null;
-function zooEdit(on){const z=$('#zoo');if(!z)return;sfx.tap();z.classList.toggle('editing',on);decSel=null;showDecTools();
-  if(on){clearInterval(walkTimer);talk('꾸밈을 손가락으로 꾹 눌러서 원하는 곳으로 옮겨 봐! 한 번 톡 누르면 뒤집거나 보관할 수 있어.')}
-  else{save();startWalking();talk(pick(['우와, 멋진 동물원이 됐어!','동물 친구들이 좋아하겠다!','최고의 동물원이야!']));sfx.ok()}}
+function zooEdit(on){const z=$('#zoo');if(!z)return;sfx.tap();decSel=null;showDecTools();
+  if(on){clearInterval(walkTimer);const zr=z.getBoundingClientRect();z.querySelectorAll('.pal').forEach(p=>{const r=p.getBoundingClientRect(),cs=getComputedStyle(p);
+      const x=(parseFloat(cs.left)/zr.width*100),y=(parseFloat(cs.top)/zr.height*100);p.classList.add('still');p.classList.remove('walking');p.style.left=x+'%';p.style.top=y+'%'});
+    z.classList.add('editing');talk('동물이나 꾸밈을 꾹 눌러서 원하는 곳으로 옮겨 봐! 꾸밈을 톡 누르면 뒤집거나 보관할 수 있어.')}
+  else{z.classList.remove('editing');z.querySelectorAll('.pal.still').forEach(p=>{void p.offsetWidth;p.classList.remove('still')});save();startWalking();talk(pick(['우와, 멋진 동물원이 됐어!','동물 친구들이 좋아하겠다!','최고의 동물원이야!']));sfx.ok()}}
 function showDecTools(){const t=$('#decTools'),z=$('#zoo');if(!t||!z)return;document.querySelectorAll('.decor.sel').forEach(x=>x.classList.remove('sel'));
   if(!decSel){t.classList.remove('on');return}const el=z.querySelector(`[data-dec="${decSel}"]`);if(!el){t.classList.remove('on');return}el.classList.add('sel');
   const zr=z.getBoundingClientRect(),r=el.getBoundingClientRect();t.style.left=Math.min(Math.max(r.left+r.width/2-zr.left,90),zr.width-90)+'px';t.style.top=Math.max(r.top-zr.top-50,6)+'px';t.classList.add('on')}
@@ -3345,6 +3350,15 @@ function decFlip(){if(!decSel)return;S.place=S.place||{};const p=decPos(decSel);
   const el=document.querySelector(`[data-dec="${decSel}"] .dec-in`);if(el)el.style.transform=`scaleX(${S.place[decSel].f?-1:1})`}
 function decStore(){if(!decSel)return;S.stored=[...new Set([...(S.stored||[]),decSel])];save();sfx.pop();const el=document.querySelector(`[data-dec="${decSel}"]`);
   if(el){el.classList.add('bye');setTimeout(()=>el.remove(),300)}toast('보관함에 넣었어요. 꾸미기 가게에서 다시 놓을 수 있어요');decSel=null;showDecTools()}
+document.addEventListener('pointerdown',e=>{const el=e.target.closest('.zoo.editing .pal');if(!el)return;e.preventDefault();
+  const z=$('#zoo'),zr=z.getBoundingClientRect(),id=el.dataset.pal,ox=parseFloat(el.style.left),oy=parseFloat(el.style.top);
+  const sx=e.clientX,sy=e.clientY;let moved=false;el.setPointerCapture(e.pointerId);el.classList.add('drag');decSel=null;showDecTools();
+  const mv=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;if(!moved)return;
+    const x=Math.min(95,Math.max(5,ox+dx/zr.width*100)),y=Math.min(98,Math.max(56,oy+dy/zr.height*100));el.classList.toggle('left',dx<0);
+    el.style.left=x+'%';el.style.top=y+'%';el.style.zIndex=y|0;el._x=x;el._y=y};
+  const up=()=>{el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);el.classList.remove('drag');
+    if(moved&&el._x!=null){S.palPlace=S.palPlace||{};S.palPlace[id]={x:+el._x.toFixed(1),y:+el._y.toFixed(1)};save();sfx.pop();vib(10);el._dragged=Date.now()}};
+  el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)});
 document.addEventListener('pointerdown',e=>{const el=e.target.closest('.zoo.editing .decor');if(!el)return;e.preventDefault();
   const z=$('#zoo'),zr=z.getBoundingClientRect(),id=el.dataset.dec,p=decPos(id);
   const sx=e.clientX,sy=e.clientY;let moved=false;el.setPointerCapture(e.pointerId);el.classList.add('drag');$('#decTools')?.classList.remove('on');
@@ -3525,11 +3539,12 @@ function trDemo(){if(!TR||TR.drawing||TR.demo||TR.picked===false)return;const s=
   const hint=$('#trHint');const g=document.createElementNS('http://www.w3.org/2000/svg','circle');g.setAttribute('r','5');g.setAttribute('class','tr-ghost');hint.appendChild(g);
   const pts=s.pts;let i=0;const step=()=>{if(!TR||!document.body.contains(g)){if(TR)TR.demo=false;return}const p=pts[Math.min(i,pts.length-1)];g.setAttribute('cx',p[0]);g.setAttribute('cy',p[1]);i++;
     if(i<pts.length+8)setTimeout(step,s.dot?300:45);else{g.remove();TR.demo=false;trMsg('이제 네 차례! <b>초록 점</b>에서 시작해')}};step()}
-document.addEventListener('click',e=>{const t=e.target.closest('[data-abc],[data-a="trReset"],[data-a="trDemo"],[data-a="trSay"],[data-a="abc"]');if(!t)return;
+document.addEventListener('click',e=>{const t=e.target.closest('[data-abc],[data-a="trReset"],[data-a="trDemo"],[data-a="trSkip"],[data-a="trSay"],[data-a="abc"]');if(!t)return;
   const d=t.dataset;if(d.abc){e.stopImmediatePropagation();document.querySelector('.modal-bg')?.remove();sfx.tap();TR=null;go('trace',{letter:d.abc,lower:false});return}
   if(d.a==='abc'){e.stopImmediatePropagation();document.querySelector('.modal-bg')?.remove();sfx.tap();TR=null;go('abc');return}
   if(d.a==='trReset'){e.stopImmediatePropagation();sfx.tap();if(TR){TR.si=0;TR.idx=0;TR.done=false;document.querySelector('.trace-pad')?.classList.remove('win');drawTraceState();const el=$('#trInk');if(el)el.setAttribute('d','');trMsg('처음부터 다시! <b>초록 점</b>에서 시작해')}return}
   if(d.a==='trDemo'){e.stopImmediatePropagation();trDemo();return}
+  if(d.a==='trSkip'){e.stopImmediatePropagation();sfx.tap();if(TR){TR.stage=false;TR=null}L.miss[L.i]=true;nextStep();return}
   if(d.a==='trSay'){e.stopImmediatePropagation();if(TR)sayAbc(TR.L);return}},true);
 
 Object.assign(ART,{
@@ -3609,6 +3624,26 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-wt],[data-
   if(d.wtb){sfx.tap();TR=null;go('wtrace',{id:d.wtb,blank:true});return}
   if(d.wtpick){if(!TR||TR.picked)return;if(d.wtpick===TR.chars[TR.bi]){sfx.ok();TR.picked=true;wtLoadChar();go('wtrace',{id:TR.word,blank:true,cont:true})}
     else{sfx.no();vib(30);TR.miss++;t.classList.add('wrong');t.disabled=true;trMsg('다시 들어 볼까? 🔊');later(()=>play(TR.word),300)}}},true);
+
+/* ---------- 스테이지 안 첫 글자 따라 쓰기 ---------- */
+function sTrace(s){
+  const w=WORD[s.w],c=w.en[0].toLowerCase(),UP=c.toUpperCase();
+  TR={ch:c,L:UP,si:0,idx:0,strokes:STROKES[c].map(sampleStroke),inks:[],miss:0,drawing:false,stage:true};
+  TR.onDone=()=>{document.querySelector('.trace-pad')?.classList.add('win');sfx.clap();vib(30);sparkles($('.trace-pad'),8);
+    const tw=$('#stw');if(tw)tw.classList.add('lit');trMsg(`<b class="en">${c}</b> 완성! <b class="en">${w.en}</b>`);sayEn(w.id);
+    S.abc=S.abc||{};if(!S.abc[UP])S.abc[UP]=1;if(TR.miss>=3)L.miss[L.i]=true;save();
+    later(()=>{TR=null;nextStep()},1900)};
+  $app.innerHTML=`<div class="screen trace-screen">${stepTop()}
+    <div class="trace-word" data-a="hearW"><div class="tw-art">${art(w.id)}</div><div class="en tw-txt" id="stw"><b>${w.en[0]}</b>${w.en.slice(1)}</div>${spkIcon(22)}</div>
+    <div class="trace-pad"><svg id="trSvg" viewBox="0 0 100 104" preserveAspectRatio="xMidYMid meet">
+      <line x1="2" y1="40" x2="98" y2="40" class="tr-mid"/><line x1="2" y1="78" x2="98" y2="78" class="tr-base"/><line x1="2" y1="6" x2="98" y2="6" class="tr-top"/>
+      <g id="trAll"><g id="trGuide">${TR.strokes.map(s=>`<path d="${s.d}" class="tr-guide"/>`).join('')}</g><g id="trDone"></g><path id="trInk" class="tr-ink" d=""/><g id="trHint"></g></g></svg></div>
+    <div class="center muted" id="trMsg" style="font-size:19px;min-height:28px"></div>
+    <div style="display:flex;gap:10px"><button class="btn ghost" style="flex:1" data-a="trDemo">👀 보여 줘</button><button class="btn ghost" style="flex:1;display:none" id="trSkip" data-a="trSkip">다음에 할래 →</button></div></div>`;
+  drawTraceState();bindTrace();
+  later(()=>{sayEn(w.id);trMsg(`<b class="en">${w.en}</b>의 첫 글자 <b class="en">${c}</b>를 써 보자! <b>초록 점</b>에서 시작해.`)},500);
+  const iv=setInterval(()=>{if(!TR||!TR.stage){clearInterval(iv);return}if(TR.miss>=3){const b=$('#trSkip');if(b)b.style.display=''}},500);
+}
 </script>
 <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));</script>
 </body></html>
