@@ -1,5 +1,5 @@
-// 워디 주 서비스 워커 (오프라인 지원) vc548089d
-const V='wz-c548089d';const AUDIO='wz-audio-bb1f4c3d';
+// 워디 주 서비스 워커 (오프라인 지원) v109fa28a
+const V='wz-109fa28a';const AUDIO='wz-audio-3aecb601';
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(['./','index.html','manifest.webmanifest','icons/icon-192.png'])).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V&&k!==AUDIO).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET')return;
