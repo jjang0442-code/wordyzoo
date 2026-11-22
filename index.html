@@ -3736,13 +3736,22 @@ render();
   const _go=go;
   try{history.replaceState({wz:'base'},'')}catch(e){}
   go=function(v,c){_go(v,c);try{if(v!=='home'&&v!=='title'&&history.state?.wz!=='inner')history.pushState({wz:'inner'},'')}catch(e){}};
-  addEventListener('popstate',()=>{
+  // 한 단계 뒤로: 처리했으면 true, 홈이라 나가야 하면 false
+  const backOne=(web)=>{
+    if(view==='home'||view==='title')return false;
+    if(document.querySelector('.modal-bg')){document.querySelector('.modal-bg').remove();return true}
+    if(view==='step'||view==='boss'||view==='test'||view==='onboard'){toast('그만하려면 왼쪽 위 ✕ 버튼을 눌러 주세요');return true}
+    const to=PARENT[view]||'home';if(web&&to==='home'){try{history.back()}catch(e){}}
+    if(typeof TR!=='undefined')TR=null;_go(to,{});return true};
+  const CapApp=IS_APP&&((window.Capacitor.Plugins&&window.Capacitor.Plugins.App)||(window.Capacitor.registerPlugin&&window.Capacitor.registerPlugin('App')));
+  if(CapApp){ // 앱: 휴대폰 뒤로 가기 버튼을 직접 받음
+    let lastHome=0;
+    CapApp.addListener('backButton',()=>{if(backOne(false))return;
+      const now=Date.now();if(now-lastHome<2000){CapApp.exitApp()}else{lastHome=now;toast('한 번 더 누르면 앱이 꺼져요')}});
+  } else addEventListener('popstate',()=>{
     if(view==='home'||view==='title')return; // 홈에서 뒤로 가기 = 앱 나가기
     try{history.pushState({wz:'inner'},'')}catch(e){}
-    if(view==='step'||view==='boss'||view==='test'||view==='onboard'){toast('그만하려면 왼쪽 위 ✕ 버튼을 눌러 주세요');return}
-    document.querySelector('.modal-bg')?.remove();
-    const to=PARENT[view]||'home';if(to==='home'){try{history.back()}catch(e){}}
-    if(typeof TR!=='undefined')TR=null;_go(to,{});
+    backOne(true);
   });
   document.addEventListener('visibilitychange',()=>{try{if(!AC)return;if(document.hidden){AC.suspend();try{speechSynthesis.cancel()}catch(e){}}else AC.resume()}catch(e){}});
 })();
