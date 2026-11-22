@@ -3230,7 +3230,18 @@ function sLearn(s){
 function playWord(id,cb){const d=sayEn(id)*1000;const sp=[...document.querySelectorAll('#wd span')];
   sp.forEach((x,k)=>later(()=>{sp.forEach(y=>y.classList.remove('lit'));x.classList.add('lit')},k*(d/sp.length)));later(()=>{sp.forEach(y=>y.classList.remove('lit'));cb&&cb()},d+250)}
 /* ---------- 아이 발음 듣기 (브라우저 음성 인식, 무료) ---------- */
-const SRec=window.SpeechRecognition||window.webkitSpeechRecognition;
+const IS_APP=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+const NSR=IS_APP?(window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition)||(window.Capacitor.registerPlugin&&window.Capacitor.registerPlugin('SpeechRecognition')):null;
+/* 앱(안드로이드)에서는 휴대폰 자체 음성 인식을 웹 방식과 같은 모양으로 감싸서 씀 */
+class NativeRec{constructor(){this.lang='en-US'}
+  async start(){const P=NSR;try{const a=await P.available();if(!a||!a.available){this.onerror&&this.onerror({error:'service-not-allowed'});return}
+    let p=await P.checkPermissions();if(p.speechRecognition!=='granted')p=await P.requestPermissions();
+    if(p.speechRecognition!=='granted'){this.onerror&&this.onerror({error:'not-allowed'});return}
+    const r=await P.start({language:this.lang,maxResults:5,partialResults:false,popup:false});const m=(r&&r.matches)||[];
+    if(m.length)this.onresult&&this.onresult({results:[m.map(t=>({transcript:t}))]});else this.onerror&&this.onerror({error:'no-speech'})}
+  catch(e){const t=String(e&&e.message||e);this.onerror&&this.onerror({error:/permission/i.test(t)?'not-allowed':'no-speech'})}}
+  stop(){try{NSR.stop().catch(()=>{})}catch(e){}} abort(){this.stop()}}
+const SRec=NSR?NativeRec:(IS_APP?null:(window.SpeechRecognition||window.webkitSpeechRecognition));
 let micBroken=false,SP=null; // SP: 지금 말하기 단계 상태
 const micOn=()=>!!SRec&&!micBroken&&S.settings.mic!==false;
 function levR(a,b){if(a===b)return 1;const m=a.length,n=b.length;if(!m||!n)return 0;let p=[...Array(n+1).keys()];

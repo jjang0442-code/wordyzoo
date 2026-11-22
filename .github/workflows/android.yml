@@ -1,0 +1,55 @@
+name: Android test APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['index.html','audio/**','app/**','.github/workflows/android.yml']
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - name: Prepare web files
+        working-directory: app
+        run: |
+          mkdir -p www assets
+          cp ../index.html ../privacy.html ../manifest.webmanifest www/
+          cp -r ../audio ../icons www/
+          # 앱 안에서는 서비스워커(웹 캐시)가 필요 없음
+          sed -i "s#<script>if('serviceWorker' in navigator)[^<]*</script>##" www/index.html
+          cp ../icons/icon-512.png assets/icon-only.png
+          cp ../icons/maskable-512.png assets/icon-foreground.png
+          cp ../icons/maskable-512.png assets/splash.png
+          cp ../icons/maskable-512.png assets/splash-dark.png
+      - name: Install
+        working-directory: app
+        run: npm install --no-audit --no-fund
+      - name: Add Android
+        working-directory: app
+        run: |
+          npx cap add android
+          npx capacitor-assets generate --android --iconBackgroundColor '#FFF6EA' --splashBackgroundColor '#FFF6EA' || echo "icon generation skipped"
+          npx cap sync android
+          # 세로 화면 고정
+          sed -i 's#<activity#<activity android:screenOrientation="portrait"#' android/app/src/main/AndroidManifest.xml
+          V=$(date +%y%m%d%H)
+          sed -i "s/versionCode 1$/versionCode $V/; s/versionName \"1.0\"/versionName \"1.0-test.$V\"/" android/app/build.gradle
+      - name: Build APK
+        working-directory: app/android
+        run: ./gradlew assembleDebug --no-daemon
+      - name: Rename
+        run: cp app/android/app/build/outputs/apk/debug/app-debug.apk wordyzoo-test.apk
+      - name: Publish to test release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: app-test
+          name: 워디 주 테스트 앱
+          prerelease: true
+          body: 폰에서 이 페이지를 열고 아래 wordyzoo-test.apk 를 눌러 내려받아 설치하세요. (설치 중 '출처를 알 수 없는 앱 허용'을 켜야 해요)
+          files: wordyzoo-test.apk

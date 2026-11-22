@@ -2,3 +2,7 @@
 docs/
 .DS_Store
 Thumbs.db
+app/node_modules/
+app/www/
+app/android/
+app/assets/

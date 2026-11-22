@@ -1,0 +1,6 @@
+{
+  "appId": "com.jjbros.wordyzoo",
+  "appName": "워디 주",
+  "webDir": "www",
+  "android": { "backgroundColor": "#FFF6EA" }
+}

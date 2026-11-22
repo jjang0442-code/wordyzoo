@@ -1,0 +1,14 @@
+{
+  "name": "wordyzoo-app",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "@capacitor/android": "^7.4.0",
+    "@capacitor/core": "^7.4.0",
+    "@capacitor-community/speech-recognition": "7.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.0",
+    "@capacitor/assets": "^3.0.5"
+  }
+}
