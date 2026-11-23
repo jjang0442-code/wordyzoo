@@ -31,7 +31,7 @@ jobs:
         run: |
           mkdir -p www assets
           cp ../index.html ../privacy.html ../manifest.webmanifest www/
-          cp -r ../audio ../icons www/
+          cp -r ../audio ../icons ../fonts www/
           # 앱 안에서는 서비스워커(웹 캐시)가 필요 없음
           sed -i "s#<script>if('serviceWorker' in navigator)[^<]*</script>##" www/index.html
           cp ../icons/icon-512.png assets/icon-only.png
@@ -52,13 +52,16 @@ jobs:
           PY
       - name: Install
         working-directory: app
-        run: npm install --no-audit --no-fund
+        run: npm install --no-audit --no-fund --legacy-peer-deps
       - name: Add Android
         working-directory: app
         run: |
           npx cap add android
           npx capacitor-assets generate --android --iconBackgroundColor '#FFF6EA' --splashBackgroundColor '#FFF6EA' || echo "icon generation skipped"
           npx cap sync android
+          # 구글 플레이 요구: Android 16(API 36) 대상
+          sed -i 's/compileSdkVersion = [0-9]*/compileSdkVersion = 36/; s/targetSdkVersion = [0-9]*/targetSdkVersion = 36/' android/variables.gradle
+          cat android/variables.gradle
           # 세로 화면 고정
           sed -i 's#<activity#<activity android:screenOrientation="portrait"#' android/app/src/main/AndroidManifest.xml
           V=$(date +%y%m%d%H)
