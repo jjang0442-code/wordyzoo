@@ -9,6 +9,17 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - kind: offline   # 게임을 앱 안에 넣은 버전 (스토어용과 같은 방식)
+            tag: app-test
+            file: wordyzoo-test.apk
+            title: 워디 주 테스트 앱 (인터넷 없이 돌아가는 버전)
+          - kind: live      # 켤 때마다 깃허브 사이트에서 최신 게임을 불러오는 버전
+            tag: app-live
+            file: wordyzoo-live.apk
+            title: 워디 주 실시간 테스트 앱
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,6 +39,17 @@ jobs:
           cp icon-background.png assets/icon-background.png
           cp ../icons/maskable-512.png assets/splash.png
           cp ../icons/maskable-512.png assets/splash-dark.png
+      - name: Live version settings
+        if: matrix.kind == 'live'
+        working-directory: app
+        run: |
+          python3 - <<'PY'
+          import json
+          c=json.load(open('capacitor.config.json'))
+          c['appId']='com.jjbros.wordyzoo.live'; c['appName']='워디 주 테스트'
+          c['server']={'url':'https://jjang0442-code.github.io/wordyzoo/','cleartext':False}
+          json.dump(c,open('capacitor.config.json','w'),ensure_ascii=False,indent=2)
+          PY
       - name: Install
         working-directory: app
         run: npm install --no-audit --no-fund
@@ -45,12 +67,12 @@ jobs:
         working-directory: app/android
         run: ./gradlew assembleDebug --no-daemon
       - name: Rename
-        run: cp app/android/app/build/outputs/apk/debug/app-debug.apk wordyzoo-test.apk
+        run: cp app/android/app/build/outputs/apk/debug/app-debug.apk ${{ matrix.file }}
       - name: Publish to test release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: app-test
-          name: 워디 주 테스트 앱
+          tag_name: ${{ matrix.tag }}
+          name: ${{ matrix.title }}
           prerelease: true
-          body: 폰에서 이 페이지를 열고 아래 wordyzoo-test.apk 를 눌러 내려받아 설치하세요. (설치 중 '출처를 알 수 없는 앱 허용'을 켜야 해요)
-          files: wordyzoo-test.apk
+          body: 폰에서 이 페이지를 열고 아래 ${{ matrix.file }} 를 눌러 내려받아 설치하세요. (설치 중 '출처를 알 수 없는 앱 허용'을 켜야 해요)
+          files: ${{ matrix.file }}
